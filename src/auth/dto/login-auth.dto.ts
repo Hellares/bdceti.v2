@@ -4,11 +4,11 @@ export class LoginAuthDto{
 
 
   @IsString()
-  @MinLength(8,{message:'Minimo 8 caracteres'})
+  //@MinLength(8)
   dni: string;
 
 
   @IsString()
-  @MinLength(6,{message:'Minimo 6 caracteres'})
+  //@MinLength(6)
   password: string;
 }

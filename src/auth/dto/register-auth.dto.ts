@@ -23,6 +23,7 @@ export class RegisterAuthDto {
   @IsString()
   phone: string;
 
+
   @IsNotEmpty()
   @IsString()
   @MinLength(6,{message: 'Minimo 6 caracteres'})

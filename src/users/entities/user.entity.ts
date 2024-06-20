@@ -34,7 +34,8 @@ export class User {
   password: string;
 
   @Column({
-    nullable: true
+    //nullable: true
+    default: 'https://res.cloudinary.com/doglf2gsy/image/upload/v1718480068/icons8-persona-de-sexo-masculino-64_gcm0sb.png'
   })
   image: string;
 

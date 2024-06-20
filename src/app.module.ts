@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
 import { CommonModule } from './common/common.module';
 import { RolesModule } from './roles/roles.module';
+import { SunatModule } from './sunat/sunat.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -20,7 +21,7 @@ import { RolesModule } from './roles/roles.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule
+    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule
   ],
   controllers: [],
   providers: [],

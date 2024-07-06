@@ -26,7 +26,7 @@ export class UsersService {
   }
   
   async findAll(paginationDto: PaginationDto){
-    const {limit = 10, offset = 0 } = paginationDto;
+    const {limit = 50, offset = 0 } = paginationDto;
     const usersFounds = await this.userRepository.find({
       where: {
         isActive: true,

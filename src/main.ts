@@ -10,6 +10,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true
     })
   )
-  await app.listen(3000, '192.168.100.10' || 'localhost');
+  const port = process.env.PORT || 3000;
+  //await app.listen(port, '192.168.100.10' || 'localhost');
+  await app.listen(port, '192.168.100.10' || 'localhost');
 }
 bootstrap();

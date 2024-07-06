@@ -16,7 +16,7 @@ export class RegisterAuthDto {
 
   @IsNotEmpty()
   @IsString()
-  @IsEmail({},{message:'Email no valido'})
+  //@IsEmail({},{message:'Email no valido'})
   email: string;
 
   @IsNotEmpty()
@@ -26,7 +26,7 @@ export class RegisterAuthDto {
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(6,{message: 'Minimo 6 caracteres'})
+  //@MinLength(6,{message: 'Minimo 6 caracteres'})
   password: string;
 
   @IsString({each: true})

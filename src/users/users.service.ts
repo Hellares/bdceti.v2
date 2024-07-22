@@ -6,7 +6,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { FilesService } from 'src/files/files.service';
-import { Rol } from 'src/roles/entities/rol.entity';
 
 @Injectable()
 export class UsersService {
@@ -33,13 +32,15 @@ export class UsersService {
       },
       take: limit,
       skip: offset,
-      relations: ['roles']
+      relations: ['roles'],
+      order: {
+        id: 'DESC',
+      }
     })
     return usersFounds;
   }
 
   async findOne( identifier: string ): Promise<User> { //BUSCA USUARIO POR DNI Y NOMBRE
-
     let user: User;
       user = await this.userRepository.findOne({
         where: {
@@ -48,7 +49,6 @@ export class UsersService {
         },
         relations: ['roles']
       });
-
     // Si no se encuentra, intentar buscar por name usando QueryBuilder
     if (!user) {
       const queryBuilder = this.userRepository.createQueryBuilder('user');
@@ -56,7 +56,6 @@ export class UsersService {
       .where('LOWER(user.name) = LOWER(:name)', { name: identifier })
       .andWhere('user.isActive = true').leftJoinAndSelect('user.roles', 'roles').getOne();
     }
-
     if (!user) {
       throw new NotFoundException(`Usuario con identificador: ${identifier} no encontrado`);
     }
@@ -95,9 +94,6 @@ export class UsersService {
 
     const updatedUser = Object.assign(userFound, user);
     return this.userRepository.save(updatedUser);
-    
-
-    
   }
 
   async softDelete(id: number): Promise<void> {

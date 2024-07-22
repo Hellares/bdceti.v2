@@ -7,6 +7,10 @@ import { FilesModule } from './files/files.module';
 import { CommonModule } from './common/common.module';
 import { RolesModule } from './roles/roles.module';
 import { SunatModule } from './sunat/sunat.module';
+import { DeviceModule } from './device/device.module';
+import { ComponentController } from './component/component.controller';
+import { ComponentService } from './component/component.service';
+import { ComponentModule } from './component/component.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -21,9 +25,9 @@ import { SunatModule } from './sunat/sunat.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule
+    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule
   ],
-  controllers: [],
-  providers: [],
+  controllers: [ComponentController],
+  providers: [ComponentService],
 })
 export class AppModule {}

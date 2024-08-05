@@ -1,6 +1,7 @@
-import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { hash } from 'bcrypt';
 import { Rol } from "src/roles/entities/rol.entity";
+import { Support } from "src/support/entities/support.entity";
 
 @Entity({name: 'users'})
 
@@ -72,6 +73,9 @@ export class User {
   })
   @ManyToMany(() => Rol, (rol) => rol.users)
   roles: Rol[];
+
+  @OneToMany(() => Support, support => support.user)
+  supports: Support[];
 
   @BeforeInsert()
   async hashPassword(){

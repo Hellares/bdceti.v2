@@ -11,6 +11,8 @@ import { DeviceModule } from './device/device.module';
 import { ComponentController } from './component/component.controller';
 import { ComponentService } from './component/component.service';
 import { ComponentModule } from './component/component.module';
+import { SupportModule } from './support/support.module';
+import { StatusModule } from './status/status.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -25,7 +27,7 @@ import { ComponentModule } from './component/component.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule
+    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule, SupportModule, StatusModule
   ],
   controllers: [ComponentController],
   providers: [ComponentService],

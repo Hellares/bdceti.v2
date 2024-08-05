@@ -1,0 +1,98 @@
+[
+  {
+    "id": 16,
+    "device": "MATHI",
+    "brand": "6iiuu",
+    "serial": "iyyki",
+    "componentA": "ujjhhj",
+    "componentB": "Ninguno",
+    "componentC": "Ninguno",
+    "accessories": "Ninguno",
+    "image1": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722744644/fepb0hgqjstrfaxbmhao.jpg",
+    "image2": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722182262/gp6iqcbxsgnopqybi04a.png",
+    "image3": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722182262/gp6iqcbxsgnopqybi04a.png",
+    "descriptionFail": "-",
+    "solution": "-",
+    "technical": "-",
+    "price": "0.00",
+    "created_at": "2024-08-03",
+    "updated_at": "2024-08-03",
+    "user_id": 81,
+    "status_id": 1,
+    "user": {
+      "id": 81,
+      "name": "JAMES JOHEL  ",
+      "lastname": "TORRES LEDEZMA",
+      "phone": "901168935"
+    },
+    "status": {
+      "id": 1,
+      "name": "REGISTRADO",
+      "image": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722110150/registro_nmbryu.png"
+    }
+  },
+  {
+    "id": 19,
+    "device": "MATHI",
+    "brand": "LENOVO",
+    "serial": "LENT089",
+    "componentA": "pernos",
+    "componentB": "Ninguno",
+    "componentC": "Ninguno",
+    "accessories": "Ninguno",
+    "image1": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722747249/qybkxdj741ohqfybyjnu.jpg",
+    "image2": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722747249/pennwqxucgozjv9d3jue.jpg",
+    "image3": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722747250/bio2j4cw3aqswgsddj5j.jpg",
+    "descriptionFail": "Esta mal",
+    "solution": "Esta mal quemalo",
+    "technical": "-",
+    "price": "20.00",
+    "created_at": "2024-08-03",
+    "updated_at": "2024-08-03",
+    "user_id": 81,
+    "status_id": 1,
+    "user": {
+      "id": 81,
+      "name": "JAMES JOHEL  ",
+      "lastname": "TORRES LEDEZMA",
+      "phone": "901168935"
+    },
+    "status": {
+      "id": 1,
+      "name": "REGISTRADO",
+      "image": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722110150/registro_nmbryu.png"
+    }
+  },
+  {
+    "id": 18,
+    "device": "MATHI",
+    "brand": "LENOVO",
+    "serial": "LENT089",
+    "componentA": "pernos",
+    "componentB": "Ninguno",
+    "componentC": "Ninguno",
+    "accessories": "Ninguno",
+    "image1": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722747164/vwvvnwq1gp2xdkptwz3q.jpg",
+    "image2": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722747164/op0xkil9ixcybaaaptmu.jpg",
+    "image3": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722747164/v6i2pgdifbghthpqgwdd.jpg",
+    "descriptionFail": "Esta mal",
+    "solution": "Esta mal quemalo",
+    "technical": "-",
+    "price": "20.00",
+    "created_at": "2024-08-03",
+    "updated_at": "2024-08-03",
+    "user_id": 81,
+    "status_id": 2,
+    "user": {
+      "id": 81,
+      "name": "JAMES JOHEL  ",
+      "lastname": "TORRES LEDEZMA",
+      "phone": "901168935"
+    },
+    "status": {
+      "id": 2,
+      "name": "REPARANDO Y/O OBSERVACION",
+      "image": "https://res.cloudinary.com/doglf2gsy/image/upload/v1722110469/mantenimiento_mfsoel.png"
+    }
+  }
+]

@@ -189,6 +189,24 @@ export class SupportService {
     return supports;
   }
 
+  // async softDelete(id: number): Promise<void> {
+  //   await this.userRepository.update(id, { isActive : false });
+  // }
+  async updateStatusReaparando(id: number): Promise<void> {
+    await this.supportRepository.update(id, { status_id: 2 });
+  }
+  async updateStatusReparado(id: number): Promise<void> {
+    await this.supportRepository.update(id, { status_id: 3 });
+  }
+  async updateStatusEntregado(id: number): Promise<void> {
+    await this.supportRepository.update(id, { status_id: 4 });
+  }
+
+  async updateStatus(update: UpdateSupportDto): Promise<void> {
+    await this.supportRepository.update(update.id, { status_id: update.status_id });
+  }
+
+
 
 
 

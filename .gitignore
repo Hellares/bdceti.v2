@@ -2,6 +2,7 @@
 /dist
 /node_modules
 env
+serviceAccountKey.json
 # Logs
 logs
 *.log

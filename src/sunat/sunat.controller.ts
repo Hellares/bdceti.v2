@@ -7,8 +7,13 @@ import { SunatService } from './sunat.service';
 export class SunatController {
   constructor(private readonly sunatService: SunatService) {}
 
-  @Get(':dni')
+  @Get('dni/:dni')
   getInfoDni(@Param('dni') dni: string) {
     return this.sunatService.getDniInfo(dni);
+  }
+
+  @Get('ruc/:ruc')
+  getInfoRuc(@Param('ruc') ruc: string) {
+    return this.sunatService.getRucInfo(ruc);
   }
 }

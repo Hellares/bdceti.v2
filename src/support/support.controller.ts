@@ -90,20 +90,20 @@ export class SupportController {
   // @UseGuards(JwtAuthGuard)
 
 
-  @Put('update/status2/:id') // cambiar el estado a entregado directamente
-  async updateStatusReaparando(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.supportService.updateStatusReaparando(id);
-  }
+  // @Put('update/status2/:id') // cambiar el estado a entregado directamente
+  // async updateStatusReaparando(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  //   await this.supportService.updateStatusReaparando(id);
+  // }
 
-  @Put('update/status3/:id') // cambiar el estado a entregado directamente
-  async updateStatusRepado(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.supportService.updateStatusReparado(id);
-  }
+  // @Put('update/status3/:id') // cambiar el estado a entregado directamente
+  // async updateStatusRepado(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  //   await this.supportService.updateStatusReparado(id);
+  // }
 
-  @Put('update/status4/:id') // cambiar el estado a entregado directamente
-  async updateStatusEntregado(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    await this.supportService.updateStatusEntregado(id);
-  }
+  // @Put('update/status4/:id') // cambiar el estado a entregado directamente
+  // async updateStatusEntregado(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  //   await this.supportService.updateStatusEntregado(id);
+  // }
 
   @Post('update-status')
   async updateStatus(

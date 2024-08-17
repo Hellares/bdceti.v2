@@ -48,6 +48,14 @@ export class UsersController {
   }
 
   @HasRoles(JwtRole.ADMIN, JwtRole.CLIENT)
+  @Put('notification_token/:id')
+  updateNotiicationToken(
+    @Param('id', ParseIntPipe) id: number, 
+    @Body() user: UpdateUserDto){ 
+    return this.usersService.update(id, user);
+  }
+
+  @HasRoles(JwtRole.ADMIN, JwtRole.CLIENT)
   @UseGuards(JwtAuthGuard, JwtRolesGuard)
   @UseGuards(JwtAuthGuard)
   @Post('upload/:id')

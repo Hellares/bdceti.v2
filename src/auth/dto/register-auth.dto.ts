@@ -14,9 +14,8 @@ export class RegisterAuthDto {
   @IsString()
   lastname: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  //@IsEmail({},{message:'Email no valido'})
   email: string;
 
   @IsNotEmpty()

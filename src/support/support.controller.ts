@@ -3,7 +3,6 @@ import { SupportService } from './support.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateSupportDto } from './dto/create-support.dto';
 import { Support } from './entities/support.entity';
-import { CustomDatabaseException } from 'src/utils/custom_database_exception';
 import { HasRoles } from 'src/auth/jwt/has-roles';
 import { JwtRole } from 'src/auth/jwt/jwt-role';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
@@ -72,7 +71,7 @@ export class SupportController {
 
 
 
-  @Get('status/:statusId')
+  @Get('status/:statusId') // buscar por estado
   async findByIdStatus(@Param('statusId', ParseIntPipe) statusId: number): Promise<Support[]> {
     try {
       const supports = await this.supportService.findByIdStatus(statusId);
@@ -85,26 +84,6 @@ export class SupportController {
     }
   }
 
-  // @HasRoles(JwtRole.ADMIN)
-  // @UseGuards(JwtAuthGuard, JwtRolesGuard)
-  // @UseGuards(JwtAuthGuard)
-
-
-  // @Put('update/status2/:id') // cambiar el estado a entregado directamente
-  // async updateStatusReaparando(@Param('id', ParseIntPipe) id: number): Promise<void> {
-  //   await this.supportService.updateStatusReaparando(id);
-  // }
-
-  // @Put('update/status3/:id') // cambiar el estado a entregado directamente
-  // async updateStatusRepado(@Param('id', ParseIntPipe) id: number): Promise<void> {
-  //   await this.supportService.updateStatusReparado(id);
-  // }
-
-  // @Put('update/status4/:id') // cambiar el estado a entregado directamente
-  // async updateStatusEntregado(@Param('id', ParseIntPipe) id: number): Promise<void> {
-  //   await this.supportService.updateStatusEntregado(id);
-  // }
-
   @Post('update-status')
   async updateStatus(
     @Body() update: UpdateSupportDto,
@@ -116,7 +95,11 @@ export class SupportController {
       console.error('Error updating status:', error);
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-
+  }
+  
+  @Get('stats')
+  async getSupportsCount(
+  ){
+    return this.supportService.getSupportsByStatusCount();
   }
 }

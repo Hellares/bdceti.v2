@@ -99,6 +99,8 @@ export class UsersService {
   async softDelete(id: number): Promise<void> {
     await this.userRepository.update(id, { isActive : false });
   }
+
+  
   
 
   private handleDBExceptions( error: any ){    

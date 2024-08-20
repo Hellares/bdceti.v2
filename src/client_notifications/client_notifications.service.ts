@@ -16,7 +16,8 @@ export class ClientNotificationsService {
 
     const user = await this.userRepository.findOne({
       where: { id: idUser },
-      select: ['id', 'notification_token']
+      select: ['id', 'notification_token'],
+      
     });
 
     if (!user || !user.notification_token) {

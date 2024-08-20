@@ -15,6 +15,7 @@ import { SupportModule } from './support/support.module';
 import { StatusModule } from './status/status.module';
 import { ClientNotificationsModule } from './client_notifications/client_notifications.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { UserHasRolesModule } from './user_has_roles/user_has_roles.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ cache: true }),
@@ -29,7 +30,7 @@ import { FirebaseModule } from './firebase/firebase.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule, SupportModule, StatusModule,FirebaseModule, ClientNotificationsModule
+    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule, SupportModule, StatusModule,FirebaseModule, ClientNotificationsModule, UserHasRolesModule
   ],
   controllers: [ComponentController],
   providers: [ComponentService],

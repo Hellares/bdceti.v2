@@ -1,7 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Support } from './entities/support.entity';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Status } from 'src/status/entities/status.entity';
 import { FilesService } from 'src/files/files.service';
 import { CreateSupportDto } from './dto/create-support.dto';
@@ -12,12 +12,24 @@ import { clear } from 'console';
 import { use } from 'passport';
 import { CustomDatabaseException } from 'src/utils/custom_database_exception';
 
+interface SupportStats {
+  total_registros: number;
+  total_registrado: number;
+  total_reparando: number;
+  total_reparado: number;
+  total_entregado: number;
+  precio_promedio: number;
+  total_marcas: number;
+  total_dispositivos: number;
+}
+
 @Injectable()
 export class SupportService {
   private logger = new Logger();
   constructor(
     @InjectRepository(Support) private supportRepository: Repository<Support>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    private dataSource: DataSource,
     // @InjectRepository(Status) private statusRepository: Repository<Status>,
     private readonly filesService: FilesService,
   ){}
@@ -192,19 +204,35 @@ export class SupportService {
   async softDelete(id: number): Promise<void> {
     await this.userRepository.update(id, { isActive : false });
   }
-  // async updateStatusReaparando(id: number): Promise<void> {
-  //   await this.supportRepository.update(id, { status_id: 2 });
-  // }
-  // async updateStatusReparado(id: number): Promise<void> {
-  //   await this.supportRepository.update(id, { status_id: 3 });
-  // }
-  // async updateStatusEntregado(id: number): Promise<void> {
-  //   await this.supportRepository.update(id, { status_id: 4 });
-  // }
 
   async updateStatus(update: UpdateSupportDto): Promise<void> {
     await this.supportRepository.update(update.id, { status_id: update.status_id });
   }
+
+  async getSupportsByStatusCount(){
+    try {
+      const result = await this.dataSource.query(`
+        SELECT 
+          COUNT(*) as total_registros,
+          SUM(CASE WHEN status_id = 1 THEN 1 ELSE 0 END) as total_registrado,
+          SUM(CASE WHEN status_id = 2 THEN 1 ELSE 0 END) as total_reparando,
+          SUM(CASE WHEN status_id = 3 THEN 1 ELSE 0 END) as total_reparado,
+          SUM(CASE WHEN status_id = 4 THEN 1 ELSE 0 END) as total_entregado,
+          AVG(price) as precio_promedio,
+          COUNT(DISTINCT brand) as total_marcas,
+          COUNT(DISTINCT device) as total_dispositivos
+        FROM 
+          supports
+      `);
+      
+      return result[0];
+    } catch (error) {
+      console.error('Error al obtener estadísticas de soporte:', error);
+      throw new Error('No se pudieron obtener las estadísticas de soporte');
+    }
+  }
+
+
 
 
 

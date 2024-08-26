@@ -55,10 +55,10 @@ export class CreateProductDto {
   @Type(() => Boolean)
   isFeatured?: boolean;
 
-  @Transform(({ value }) => transformToStringArray(value))
-  @IsString({ each: true })
   @IsArray()
+  @IsString({ each: true })
   @IsOptional()
+  @Transform(({ value }) => transformToStringArray(value))
   tags?: string[];
 
   @IsOptional()

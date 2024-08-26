@@ -16,6 +16,11 @@ import { StatusModule } from './status/status.module';
 import { ClientNotificationsModule } from './client_notifications/client_notifications.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { UserHasRolesModule } from './user_has_roles/user_has_roles.module';
+import { ProductsModule } from './products/products.module';
+import { SupplierModule } from './supplier/supplier.module';
+import { CategoryModule } from './category/category.module';
+import { ProductImageModule } from './product-image/product-image.module';
+import { ReviewModule } from './review/review.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ cache: true }),
@@ -30,7 +35,7 @@ import { UserHasRolesModule } from './user_has_roles/user_has_roles.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule, SupportModule, StatusModule,FirebaseModule, ClientNotificationsModule, UserHasRolesModule
+    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule, SupportModule, StatusModule,FirebaseModule, ClientNotificationsModule, UserHasRolesModule, ProductsModule, SupplierModule, CategoryModule, ProductImageModule, ReviewModule
   ],
   controllers: [ComponentController],
   providers: [ComponentService],

@@ -40,6 +40,17 @@ export class UsersService {
     return usersFounds;
   }
 
+  async findOne2(id: number): Promise<User> { //busca un usuario por su id para la creacion de un review
+    const user = await this.userRepository.findOne(
+      { where: { id },
+      select:['id', 'name', 'dni', 'email'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+    return user;
+  }
+
   async findOne( identifier: string ): Promise<User> { //BUSCA USUARIO POR DNI Y NOMBRE
     let user: User;
       user = await this.userRepository.findOne({

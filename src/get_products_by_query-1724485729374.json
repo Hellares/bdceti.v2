@@ -1,0 +1,238 @@
+{
+	"items": [
+		{
+			"id": "6960bb14-1ff0-48ba-b7f4-de62cfc56c6d",
+			"name": "Ball",
+			"sku": "cda2b62f-16eb-4432-a0b9-ad6f83c907f5",
+			"description": "Vallum inflammatio ciminatio accendo uter audax consequuntur. Temptatio ademptio vel. Tam terreo talio deserunt unde colo defetiscor valde. Adfero ascit derelinquo defluo. Absque atrox argentum itaque.",
+			"shortDescription": "caute patrocinor creo",
+			"price": "950.00",
+			"discountPrice": "511.00",
+			"isOnSale": false,
+			"stock": 100,
+			"isActive": true,
+			"isFeatured": true,
+			"tags": [
+				"tag1",
+				"tag2"
+			],
+			"attributes": {
+				"color": "azul"
+			},
+			"weight": "10.50",
+			"dimensions": "10x5",
+			"brand": "ACER",
+			"manufacturer": "ACER",
+			"viewCount": 10,
+			"salesCount": 10,
+			"likesCount": 10,
+			"averageRating": "5.00",
+			"availableFrom": "2024-08-23T21:36:24.354Z",
+			"availableTo": "2024-11-18T01:57:05.057Z",
+			"metaTitle": "tam aegre aduro",
+			"metaDescription": "Vomer voluptatem modi addo decimus numquam. Esse ad maxime dolore cunabula. Unde porro vito thesaurus astrum vomito terreo delicate amaritudo. Voluntarius vinum tenuis torrens denique totam. Avaritia facilis concedo accedo.",
+			"slug": "asporto",
+			"createdAt": "2024-08-24T07:11:42.443Z",
+			"updatedAt": "2024-08-24T07:11:42.443Z",
+			"categories": [
+				{
+					"id": 2,
+					"name": "ELECTRONICA",
+					"description": "TODO mouses",
+					"slug": "ELECTRONICA"
+				}
+			],
+			"suppliers": [
+				{
+					"id": 2,
+					"documentType": "DNI",
+					"documentNumber": "44885296",
+					"name": "JAMES TORRES",
+					"contactPerson": null,
+					"email": null,
+					"phone": null,
+					"address": null
+				}
+			],
+			"images": [
+				{
+					"id": 53,
+					"url": "https://res.cloudinary.com/doglf2gsy/image/upload/v1724483504/efmmisixhjx3g7dusscu.jpg",
+					"alt": null,
+					"isMain": false
+				},
+				{
+					"id": 54,
+					"url": "https://res.cloudinary.com/doglf2gsy/image/upload/v1724483505/ypuft2y9oio4f5dknqgs.png",
+					"alt": null,
+					"isMain": false
+				}
+			]
+		},
+		{
+			"id": "d602a829-e1f3-4671-81c9-b22890293bb7",
+			"name": "Keyboard",
+			"sku": "1c15c70f-f4ba-438c-9282-83935a16e1e5",
+			"description": "Cernuus vetus volubilis facere audentia beatus. Communis vociferor voluntarius brevis aspernatur capio virga. Usque itaque cibus cibo deporto delego nesciunt. Usque cernuus ait aspicio vespillo defero tactus tenuis aestus carmen.",
+			"shortDescription": "iusto clamo cupiditate",
+			"price": "486.00",
+			"discountPrice": "398.00",
+			"isOnSale": true,
+			"stock": 100,
+			"isActive": true,
+			"isFeatured": true,
+			"tags": [
+				"tag1",
+				"tag2"
+			],
+			"attributes": {
+				"color": "azul"
+			},
+			"weight": "10.50",
+			"dimensions": "10x5",
+			"brand": "ACER",
+			"manufacturer": "ACER",
+			"viewCount": 10,
+			"salesCount": 10,
+			"likesCount": 10,
+			"averageRating": "5.00",
+			"availableFrom": "2024-08-24T05:38:07.376Z",
+			"availableTo": "2025-02-03T06:00:03.925Z",
+			"metaTitle": "tamquam adicio laudantium",
+			"metaDescription": "Volo aut harum arcesso acies facere. Natus cunabula armarium amissio. Tego suppono creber strenuus aequitas thesaurus conculco velociter vinco coma. Verus vix solum thesaurus congregatio curriculum triduana rem adamo. Capio consectetur nulla arma cicuta vulpes id pauci arma vulariter.",
+			"slug": "claudeo",
+			"createdAt": "2024-08-24T07:11:31.446Z",
+			"updatedAt": "2024-08-24T07:11:31.446Z",
+			"categories": [
+				{
+					"id": 1,
+					"name": "OFICINA",
+					"description": "TODO mouses",
+					"slug": "OFICINA"
+				},
+				{
+					"id": 2,
+					"name": "ELECTRONICA",
+					"description": "TODO mouses",
+					"slug": "ELECTRONICA"
+				}
+			],
+			"suppliers": [
+				{
+					"id": 1,
+					"documentType": "RUC",
+					"documentNumber": "20132373958",
+					"name": "CHIMU AGROPECUARIA SA",
+					"contactPerson": null,
+					"email": null,
+					"phone": null,
+					"address": null
+				},
+				{
+					"id": 2,
+					"documentType": "DNI",
+					"documentNumber": "44885296",
+					"name": "JAMES TORRES",
+					"contactPerson": null,
+					"email": null,
+					"phone": null,
+					"address": null
+				}
+			],
+			"images": [
+				{
+					"id": 50,
+					"url": "https://res.cloudinary.com/doglf2gsy/image/upload/v1724483492/lj7zlhwemskbh56teagk.jpg",
+					"alt": null,
+					"isMain": false
+				}
+			]
+		},
+		{
+			"id": "d744e025-cfe2-4b5f-bf09-d703cfbacf00",
+			"name": "Mouse",
+			"sku": "c46500bb-16a4-4725-9097-d5427ca1f850",
+			"description": "Tamen cariosus centum alioqui ancilla. Tendo expedita arma tollo thermae corona supellex comes terra. Inflammatio blandior deleniti.",
+			"shortDescription": "quo abbas strenuus",
+			"price": "213.00",
+			"discountPrice": "976.00",
+			"isOnSale": true,
+			"stock": 100,
+			"isActive": true,
+			"isFeatured": true,
+			"tags": [
+				"tag1",
+				"tag2"
+			],
+			"attributes": {
+				"color": "azul"
+			},
+			"weight": "10.50",
+			"dimensions": "10x5",
+			"brand": "ACER",
+			"manufacturer": "ACER",
+			"viewCount": 10,
+			"salesCount": 10,
+			"likesCount": 10,
+			"averageRating": "5.00",
+			"availableFrom": "2024-08-23T22:55:51.252Z",
+			"availableTo": "2025-03-22T18:58:14.205Z",
+			"metaTitle": "deleniti apto perspiciatis",
+			"metaDescription": "Sint confugo quos inflammatio arbitro delinquo aggredior voco vilitas validus. Cimentarius perferendis voluntarius conturbo. Delego crustulum adulescens. Dolorem adipiscor curatio crur corporis aufero voluptate. Assentator facere vitium repudiandae approbo soleo. Adstringo condico addo pauper teres vestigium amor spiritus.",
+			"slug": "assumenda",
+			"createdAt": "2024-08-24T07:11:35.349Z",
+			"updatedAt": "2024-08-24T07:11:35.349Z",
+			"categories": [
+				{
+					"id": 1,
+					"name": "OFICINA",
+					"description": "TODO mouses",
+					"slug": "OFICINA"
+				},
+				{
+					"id": 2,
+					"name": "ELECTRONICA",
+					"description": "TODO mouses",
+					"slug": "ELECTRONICA"
+				}
+			],
+			"suppliers": [
+				{
+					"id": 1,
+					"documentType": "RUC",
+					"documentNumber": "20132373958",
+					"name": "CHIMU AGROPECUARIA SA",
+					"contactPerson": null,
+					"email": null,
+					"phone": null,
+					"address": null
+				},
+				{
+					"id": 2,
+					"documentType": "DNI",
+					"documentNumber": "44885296",
+					"name": "JAMES TORRES",
+					"contactPerson": null,
+					"email": null,
+					"phone": null,
+					"address": null
+				}
+			],
+			"images": [
+				{
+					"id": 51,
+					"url": "https://res.cloudinary.com/doglf2gsy/image/upload/v1724483496/wpheqkponsbuhjup5sav.jpg",
+					"alt": null,
+					"isMain": false
+				}
+			]
+		}
+	],
+	"meta": {
+		"totalItems": 20,
+		"itemCount": 3,
+		"itemsPerPage": 10,
+		"totalPages": 2,
+		"currentPage": 2
+	}
+}

@@ -1,0 +1,102 @@
+{
+	"items": [
+		{
+			"id": "6960bb14-1ff0-48ba-b7f4-de62cfc56c6d",
+			"name": "Ball",
+			"sku": "cda2b62f-16eb-4432-a0b9-ad6f83c907f5",
+			"description": "Vallum inflammatio ciminatio accendo uter audax consequuntur. Temptatio ademptio vel. Tam terreo talio deserunt unde colo defetiscor valde. Adfero ascit derelinquo defluo. Absque atrox argentum itaque.",
+			"shortDescription": "caute patrocinor creo",
+			"price": "950.00",
+			"discountPrice": "511.00",
+			"isOnSale": true,
+			"stock": 100,
+			"isActive": true,
+			"isFeatured": true,
+			"tags": [
+				"tag1",
+				"tag2"
+			],
+			"attributes": {
+				"color": "azul"
+			},
+			"weight": "10.50",
+			"dimensions": "10x5",
+			"brand": "ACER",
+			"manufacturer": "ACER",
+			"viewCount": 10,
+			"salesCount": 10,
+			"likesCount": 10,
+			"averageRating": "5.00",
+			"availableFrom": "2024-08-23T21:36:24.354Z",
+			"availableTo": "2024-11-18T01:57:05.057Z",
+			"metaTitle": "tam aegre aduro",
+			"metaDescription": "Vomer voluptatem modi addo decimus numquam. Esse ad maxime dolore cunabula. Unde porro vito thesaurus astrum vomito terreo delicate amaritudo. Voluntarius vinum tenuis torrens denique totam. Avaritia facilis concedo accedo.",
+			"slug": "asporto",
+			"createdAt": "2024-08-24T07:11:42.443Z",
+			"updatedAt": "2024-08-24T07:11:42.443Z",
+			"categories": [
+				{
+					"id": 1,
+					"name": "OFICINA",
+					"description": "TODO mouses",
+					"slug": "OFICINA"
+				},
+				{
+					"id": 2,
+					"name": "ELECTRONICA",
+					"description": "TODO mouses",
+					"slug": "ELECTRONICA"
+				}
+			],
+			"suppliers": [
+				{
+					"id": 1,
+					"documentType": "RUC",
+					"documentNumber": "20132373958",
+					"name": "CHIMU AGROPECUARIA SA",
+					"contactPerson": null,
+					"email": null,
+					"phone": null,
+					"address": null
+				},
+				{
+					"id": 2,
+					"documentType": "DNI",
+					"documentNumber": "44885296",
+					"name": "JAMES TORRES",
+					"contactPerson": null,
+					"email": null,
+					"phone": null,
+					"address": null
+				}
+			],
+			"images": [
+				{
+					"id": 52,
+					"url": "https://res.cloudinary.com/doglf2gsy/image/upload/v1724483503/kfjgasqmduwfpakutpy5.jpg",
+					"alt": null,
+					"isMain": false
+				},
+				{
+					"id": 53,
+					"url": "https://res.cloudinary.com/doglf2gsy/image/upload/v1724483504/efmmisixhjx3g7dusscu.jpg",
+					"alt": null,
+					"isMain": false
+				},
+				{
+					"id": 54,
+					"url": "https://res.cloudinary.com/doglf2gsy/image/upload/v1724483505/ypuft2y9oio4f5dknqgs.png",
+					"alt": null,
+					"isMain": false
+				}
+			]
+		}
+	],
+	"meta": {
+		"totalItems": 20,
+		"itemCount": 1,
+		"itemsPerPage": 10,
+		"totalPages": 2,
+		"currentPage": 1
+	}
+}

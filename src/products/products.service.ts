@@ -9,6 +9,7 @@ import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginat
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilesService } from 'src/files/files.service';
 import { ProductImage } from 'src/product-image/entities/productImages.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @Injectable()
 export class ProductsService {
@@ -21,6 +22,9 @@ export class ProductsService {
     private readonly supplierRepository: Repository<Supplier>,
     @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
+    @InjectRepository(Review)
+    private readonly reviewRepository: Repository<Review>,
+
     private readonly fileService: FilesService,
     private dataSource: DataSource
   ){}
@@ -206,14 +210,6 @@ export class ProductsService {
     };
   }
 
-  async findAll1(options: IPaginationOptions): Promise<Pagination<Product>> {
-    const queryBuilder = this.productRepository.createQueryBuilder('product')
-      .leftJoinAndSelect('product.categories', 'category')
-      .leftJoinAndSelect('product.suppliers', 'supplier')
-      .leftJoinAndSelect('product.images', 'image');
-
-    return paginate<Product>(queryBuilder, options);
-  }
 
   async findOne(id: string): Promise<Product> {
     const product = await this.productRepository.findOne({
@@ -228,25 +224,6 @@ export class ProductsService {
     return product;
   }
 
-  // async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
-  //   const { categoryIds, supplierIds, ...updateData } = updateProductDto;
-
-  //   const product = await this.findOne(id);
-
-  //   if (categoryIds) {
-  //     const categories = await this.categoryRepository.findBy({ id: In(categoryIds) });
-  //     product.categories = categories;
-  //   }
-
-  //   if (supplierIds) {
-  //     const suppliers = await this.supplierRepository.findBy({ id: In(supplierIds) });
-  //     product.suppliers = suppliers;
-  //   }
-
-  //   Object.assign(product, updateData);
-
-  //   return this.productRepository.save(product);
-  // }
 
   async search(params: {
     query?: string;
@@ -262,7 +239,8 @@ export class ProductsService {
     const queryBuilder = this.productRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.categories', 'category')
       .leftJoinAndSelect('product.suppliers', 'supplier')
-      .leftJoinAndSelect('product.images', 'image');
+      .leftJoinAndSelect('product.images', 'image')
+      .leftJoinAndSelect('product.reviews', 'review');
 
     if (query) {
       queryBuilder.andWhere('(product.name ILIKE :query OR product.description ILIKE :query)', { query: `%${query}%` });

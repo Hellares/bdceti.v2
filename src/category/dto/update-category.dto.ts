@@ -7,7 +7,7 @@ export class UpdateCategoryDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  imageUrl?: string;
 
   @IsString()
   @IsOptional()

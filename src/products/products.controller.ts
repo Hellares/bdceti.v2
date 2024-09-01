@@ -46,43 +46,17 @@ export class ProductsController {
   //   }
   // }
 
-  //! BUSCA UN PRODUCTO POR SU UUID --http://192.168.18.5:3000/products/d744e025-cfe2-4b5f-bf09-d703cfbacf00
-  
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Product> {
-    try {
-      return await this.productsService.findOne(id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new NotFoundException(`Failed to retrieve product: ${error.message}`);
-    }
-  }
 
-  //! BUSQUEDA TODOS LOS PRODUCTOS PAGINADOS
-  @Get()
-  async findAll0(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
-  ): Promise<Pagination<Product>> {
-    return this.productsService.findAll({
-      page,
-      limit,
-      // route: '/products',
-    });
-  }
 
   @Get()
   async findAll(
     @Query('page') page = 1,
-    @Query('limit') limit = 10
+    @Query('limit') limit = 20
   ): Promise<Pagination<Product>> {
     limit = limit > 100 ? 100 : limit;
     return this.productsService.findAll({
       page,
       limit,
-      route: 'http://your-api-url/products',
     });
   }
 

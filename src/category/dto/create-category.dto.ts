@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateCategoryDto {
   @IsString()
@@ -6,7 +7,7 @@ export class CreateCategoryDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  imageUrl?: string;
 
   @IsString()
   @IsOptional()
@@ -14,5 +15,6 @@ export class CreateCategoryDto {
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   parentId?: number;
 }

@@ -269,35 +269,48 @@ export class ProductsService {
     return paginate<Product>(queryBuilder, options);
   }
 
-  // async updateStock(id: string, quantity: number): Promise<Product> {
-  //   const product = await this.findOne(id);
-  //   if (product.stock + quantity < 0) {
-  //     throw new BadRequestException('Insufficient stock');
-  //   }
-  //   product.stock += quantity;
-  //   return this.productRepository.save(product);
-  // }
+  async searchCategories(params: {
+    query?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    categoryId?: string;
+    isOnSale?: boolean;
+    inStock?: boolean;
+    options: IPaginationOptions;
+  }): Promise<Pagination<Product>> {
+    const { query, minPrice, maxPrice, categoryId, isOnSale, inStock, options } = params;
 
-  // async getFeaturedProducts(limit: number = 10): Promise<Product[]> {
-  //   return this.productRepository.find({
-  //     where: { isFeatured: true },
-  //     take: limit,
-  //     relations: ['images'],
-  //   });
-  // }
+    const queryBuilder = this.productRepository.createQueryBuilder('product')
+      .leftJoinAndSelect('product.categories', 'category')
+      .leftJoinAndSelect('product.suppliers', 'supplier')
+      .leftJoinAndSelect('product.images', 'image')
+      .leftJoinAndSelect('product.reviews', 'review');
 
-  // async getRelatedProducts(productId: string, limit: number = 10): Promise<Product[]> {
-  //   const product = await this.findOne(productId);
-  //   const categoryIds = product.categories.map(cat => cat.id);
+    if (query) {
+      queryBuilder.andWhere('(product.name ILIKE :query OR product.description ILIKE :query)', { query: `%${query}%` });
+    }
 
-  //   return this.productRepository
-  //     .createQueryBuilder('product')
-  //     .innerJoin('product.categories', 'category')
-  //     .where('category.id IN (:...categoryIds)', { categoryIds })
-  //     .andWhere('product.id != :productId', { productId })
-  //     .take(limit)
-  //     .getMany();
-  // }
+    if (minPrice !== undefined && maxPrice !== undefined) {
+      queryBuilder.andWhere('product.price BETWEEN :minPrice AND :maxPrice', { minPrice, maxPrice });
+    } else if (minPrice !== undefined) {
+      queryBuilder.andWhere('product.price >= :minPrice', { minPrice });
+    } else if (maxPrice !== undefined) {
+      queryBuilder.andWhere('product.price <= :maxPrice', { maxPrice });
+    }
 
+    if (categoryId) {
+      queryBuilder.andWhere('category.id = :categoryId', { categoryId });
+    }
+
+    if (isOnSale !== undefined) {
+      queryBuilder.andWhere('product.isOnSale = :isOnSale', { isOnSale });
+    }
+
+    if (inStock !== undefined) {
+      queryBuilder.andWhere('product.stock > 0');
+    }
+
+    return paginate<Product>(queryBuilder, options);
+  }
   
 }

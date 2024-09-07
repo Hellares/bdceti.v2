@@ -60,6 +60,24 @@ export class ProductsController {
     });
   }
 
+  @Get('id/:id')
+  async findOne(
+    @Param('id') id: string
+  ){
+    try {
+      const product = await this.productsService.findOne(id);
+      if (!product) {
+        throw new NotFoundException(`Product with ID "${id}" not found`);
+      }
+      return product;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new NotFoundException(`Product with ID "${id}" not found`);
+    }
+  }
+
 
   //! BUSQUEDA PRODUCTOS AVANZADAS (SEGUN PARAMETROS)
   @Get('search')
@@ -74,6 +92,31 @@ export class ProductsController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
   ) {
     return this.productsService.search({
+      query,
+      minPrice,
+      maxPrice,
+      categoryId,
+      isOnSale,
+      inStock,
+      options: {
+        page,
+        limit
+      },
+    });
+  }
+
+  @Get('search/categories')
+  searchCategories(
+    @Query('query') query?: string,
+    @Query('minPrice', new DefaultValuePipe(0), ParseIntPipe) minPrice?: number,
+    @Query('maxPrice', new DefaultValuePipe(Number.MAX_SAFE_INTEGER), ParseIntPipe) maxPrice?: number,
+    @Query('categoryId') categoryId?: string,
+    @Query('isOnSale') isOnSale?: boolean,
+    @Query('inStock') inStock?: boolean,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+  ) {
+    return this.productsService.searchCategories({
       query,
       minPrice,
       maxPrice,

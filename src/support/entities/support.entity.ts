@@ -1,4 +1,5 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import * as moment from 'moment-timezone';
 import { User } from "src/users/entities/user.entity";
 import { Status } from "src/status/entities/status.entity";
 
@@ -55,18 +56,39 @@ export class Support{
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
   price: number;
 
-  @Column({
-    type:'date', 
+  //--
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  estimatedPrice: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  finalPrice: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  depositAmount: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  remainingBalance: number;
+  //--
+
+  @Column({  //fecha de creacion
+    type:'timestamp', 
     default:() =>'CURRENT_TIMESTAMP'
   })
   created_at: Date;
 
-  @Column({
-    type:'date', 
+  @Column({ //fecha de actualizacion de estado
+    type:'timestamp', 
     default:() =>'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP'
   })
-  updated_at: Date;
+  updateStatus_at: Date;
+
+  @Column({ //fecha de entrega al cliente
+    type:'timestamp', 
+    default:() =>'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP'
+  })
+  delivered_at: Date;
 
   @ManyToOne(() => User, user => user.supports)
   @JoinColumn({ name: 'user_id' })
@@ -81,6 +103,11 @@ export class Support{
 
   @Column({default: 1})
   status_id: number;
+
+  @BeforeInsert()
+  setCreatedAtToPeruTime() {
+    this.created_at = new Date(moment().tz('America/Lima').format());
+  }
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -102,4 +129,22 @@ export class Support{
     this.status_id = this.status_id || 1;
   }
 
+  @BeforeInsert()
+  @BeforeUpdate()
+  calculatePrices() {
+    this.estimatedPrice = this.estimatedPrice || 0.00;
+    this.finalPrice = this.finalPrice || this.estimatedPrice;
+    this.depositAmount = this.depositAmount || 0.00;
+    this.remainingBalance = Math.max(0, this.finalPrice - this.depositAmount);
+  }
+
+  // @BeforeUpdate()
+  // updateTimestamps() {
+  //   this.updateStatus_at = new Date(moment().tz('America/Lima').format());
+  // }
+
+  // @BeforeUpdate()
+  // updateDeliveredAt() {
+  //   this.delivered_at = new Date(moment().tz('America/Lima').format());
+  // }
 }

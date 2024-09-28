@@ -1,8 +1,6 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
-export class CreateSupportDto{
-
-  
+export class CreateSupportDto{  
 
   @IsString()
   @IsOptional()
@@ -47,6 +45,18 @@ export class CreateSupportDto{
   //@IsString()
   @IsOptional()
   price?: number;
+
+  @IsOptional()
+  estimatedPrice?: number; //precio estimado
+
+  @IsOptional()
+  finalPrice?: number;  // precio final
+
+  @IsOptional()
+  depositAmount?: number; // monto depositado a cuenta
+
+  @IsOptional()
+  remainingBalance?: number; // saldo pendiente
 
   @IsNotEmpty()
   user_id: number;

@@ -1,4 +1,5 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import * as moment from 'moment-timezone';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Support } from './entities/support.entity';
 import { Repository, DataSource } from 'typeorm';
@@ -11,6 +12,7 @@ import { User } from 'src/users/entities/user.entity';
 import { clear } from 'console';
 import { use } from 'passport';
 import { CustomDatabaseException } from 'src/utils/custom_database_exception';
+
 
 interface SupportStats {
   total_registros: number;
@@ -205,8 +207,22 @@ export class SupportService {
     await this.userRepository.update(id, { isActive : false });
   }
 
-  async updateStatus(update: UpdateSupportDto): Promise<void> {
-    await this.supportRepository.update(update.id, { status_id: update.status_id });
+  async updateStatus(update: UpdateSupportDto): Promise<Support> { // FECHA DE CAMBIO DE ESTADO-REPARANDO Y REPARADO
+    const support = await this.supportRepository.findOne({ where: { id: update.id } });
+    if (!support) {
+      throw new NotFoundException(`Support with ID ${update.id} not found`);
+    }
+    const newStatusId = Number(update.status_id);
+    support.status_id = newStatusId;
+    
+    if (newStatusId === 4) {
+      support.delivered_at = new Date(moment().tz('America/Lima').format());
+    } else{
+      support.updateStatus_at = new Date(moment().tz('America/Lima').format());
+    }
+
+    const updatedSupport  = await this.supportRepository.save(support);
+    return updatedSupport;
   }
 
   async getSupportsByStatusCount(){

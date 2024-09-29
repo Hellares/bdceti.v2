@@ -1,3 +1,4 @@
+import { Transform } from "class-transformer";
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateSupportDto{  
@@ -46,15 +47,19 @@ export class CreateSupportDto{
   @IsOptional()
   price?: number;
 
+  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
   estimatedPrice?: number; //precio estimado
 
+  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
   finalPrice?: number;  // precio final
 
+  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
   depositAmount?: number; // monto depositado a cuenta
 
+  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
   remainingBalance?: number; // saldo pendiente
 

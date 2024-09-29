@@ -21,6 +21,10 @@ import { SupplierModule } from './supplier/supplier.module';
 import { CategoryModule } from './category/category.module';
 import { ProductImageModule } from './product-image/product-image.module';
 import { ReviewModule } from './review/review.module';
+import { BrandModule } from './brand/brand.module';
+
+
+
 @Module({
   imports: [
     ConfigModule.forRoot({ cache: true }),
@@ -35,7 +39,7 @@ import { ReviewModule } from './review/review.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule, SupportModule, StatusModule,FirebaseModule, ClientNotificationsModule, UserHasRolesModule, ProductsModule, SupplierModule, CategoryModule, ProductImageModule, ReviewModule
+    UsersModule, AuthModule, FilesModule, CommonModule, RolesModule, SunatModule, DeviceModule, ComponentModule, SupportModule, StatusModule,FirebaseModule, ClientNotificationsModule, UserHasRolesModule, ProductsModule, SupplierModule, CategoryModule, ProductImageModule, ReviewModule, BrandModule
   ],
   controllers: [ComponentController],
   providers: [ComponentService],

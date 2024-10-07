@@ -17,15 +17,15 @@ export class CreateSupportDto{
 
   @IsString()
   @IsOptional()
-  componentA: string;
+  component_a: string;
 
   @IsString()
   @IsOptional()
-  componentB?: string;
+  component_b?: string;
 
   @IsString()
   @IsOptional()
-  componentC?: string;
+  component_c?: string;
 
   @IsString()
   @IsOptional()
@@ -33,7 +33,7 @@ export class CreateSupportDto{
 
   @IsString()
   @IsOptional()
-  descriptionFail?: string;
+  description_fail?: string;
 
   @IsString()
   @IsOptional()
@@ -49,19 +49,19 @@ export class CreateSupportDto{
 
   @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
-  estimatedPrice?: number; //precio estimado
+  estimated_price?: number; //precio estimado
 
   @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
-  finalPrice?: number;  // precio final
+  final_price?: number;  // precio final
 
   @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
-  depositAmount?: number; // monto depositado a cuenta
+  deposit_amount?: number; // monto depositado a cuenta
 
   @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
-  remainingBalance?: number; // saldo pendiente
+  remaining_balance?: number; // saldo pendiente
 
   @IsNotEmpty()
   user_id: number;

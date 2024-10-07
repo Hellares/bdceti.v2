@@ -36,76 +36,52 @@ export class SupportService {
     private readonly filesService: FilesService,
   ){}
 
-  // async createSupport(files: Array<Express.Multer.File>, support: CreateSupportDto) {
-  //   if (files.length === 0) {
-  //     throw new HttpException('Al menos una imagen es obligatoria', HttpStatus.BAD_REQUEST);
-  //   }
   
-  //   const newSupport = this.supportRepository.create(support);
-  //   let savedSupport = await this.supportRepository.save(newSupport);
-  
-  //   const imageFields = ['image1', 'image2', 'image3'];
-  //   const uploadPromises = files.slice(0, 3).map(async (file, index) => {
-  //     const { secure_url } = await this.filesService.uploadImage(file);
-  //     if (secure_url) {
-  //       savedSupport[imageFields[index]] = secure_url;
-  //     }
-  //   });
-  
-  //   await Promise.all(uploadPromises);
-    
-  //   savedSupport = await this.supportRepository.save(savedSupport);
-  
-  //   savedSupport = await this.supportRepository.findOne({
-  //     where: { id: savedSupport.id },
-  //     relations: ['user'],
-  //     select: {
-  //       user: {
-  //         id: true,
-  //         name: true,
-  //         lastname: true,
-  //         phone: true,
-  //         // Añade aquí otros campos del usuario que quieras incluir
-  //       }
-  //     }
-  //   });
-  
-  //   return savedSupport;
-  // }
-
-  async createSupport(files: Array<Express.Multer.File>, support: CreateSupportDto) {
+  async createSupport(files: Express.Multer.File[] | undefined, support: CreateSupportDto) {
     const newSupport = this.supportRepository.create(support);
     let savedSupport = await this.supportRepository.save(newSupport);
   
     const imageFields = ['image1', 'image2', 'image3'];
     
-    const uploadPromises = files.slice(0, 3).map(async (file, index) => {
-      const { secure_url } = await this.filesService.uploadImage(file);
-      if (secure_url) {
-        savedSupport[imageFields[index]] = secure_url;
-      }
-    });
-  
-    await Promise.all(uploadPromises);
-    
-    savedSupport = await this.supportRepository.save(savedSupport);
-  
-    savedSupport = await this.supportRepository.findOne({
-      where: { id: savedSupport.id },
-      relations: ['user'],
-      select: {
-        user: {
-          id: true,
-          name: true,
-          lastname: true,
-          phone: true,
-          // Añade aquí otros campos del usuario que quieras incluir
+    if (files && files.length > 0) {
+      const uploadPromises = files.slice(0, 3).map(async (file, index) => {
+        try {
+          const { secure_url } = await this.filesService.uploadImage(file);
+          if (secure_url) {
+            savedSupport[imageFields[index]] = secure_url;
+          }
+        } catch (error) {
+          console.error(`Error uploading image ${index + 1}:`, error);
+          // Optionally, you can choose to throw an error here or just continue
         }
-      },
+      });
+    
+      await Promise.all(uploadPromises);
       
-    });
+      savedSupport = await this.supportRepository.save(savedSupport);
+    }
+  
+    try {
+      savedSupport = await this.supportRepository.findOne({
+        where: { id: savedSupport.id },
+        relations: ['user'],
+        select: {
+          user: {
+            id: true,
+            name: true,
+            lastname: true,
+            phone: true,
+            // Add here other user fields you want to include
+          }
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Error retrieving saved support with user details');
+    }
+
     return savedSupport;
   }
+
 
   async findByIdClient(userId: number): Promise<Support[]> {
     const supports = await this.supportRepository.find({
@@ -218,11 +194,77 @@ export class SupportService {
     if (newStatusId === 4) {
       support.delivered_at = new Date(moment().tz('America/Lima').format());
     } else{
-      support.updateStatus_at = new Date(moment().tz('America/Lima').format());
+      support.update_status_at = new Date(moment().tz('America/Lima').format());
     }
 
     const updatedSupport  = await this.supportRepository.save(support);
     return updatedSupport;
+  }
+
+  async findAllRegistered(): Promise<any[]> { //! buscar todos los soportes registrados o pendientes de la vista
+    try {
+      const query = `SELECT * FROM registered_supports`;
+      const supports = await this.dataSource.query(query);
+      if (supports.length === 0) {
+        throw new NotFoundException('No se encontraron soportes registrados');
+      }
+      return supports;
+    } catch (error) {
+      this.logger.error('Error al buscar soportes registrados', error.stack);
+      throw new CustomDatabaseException('Error al buscar soportes registrados. Por favor, inténtelo de nuevo más tarde.');
+    }
+  }
+
+  async findAllRegisteredTime(timeFilter: 'week' | 'month' | 'year' = 'week', month?: number, year?: number): Promise<any[]> {
+    try {
+      let timeCondition: string;
+      let params: any[] = [];
+
+      switch (timeFilter) {
+        case 'week':
+          timeCondition = "date_trunc('week', created_at) = date_trunc('week', CURRENT_DATE)";
+          break;
+        case 'month':
+          if (!month || !year) {
+            throw new BadRequestException('Mes y año son requeridos para el filtro mensual');
+          }
+          timeCondition = "date_trunc('month', created_at) = date_trunc('month', $1::date)";
+          params.push(`${year}-${month.toString().padStart(2, '0')}-01`);
+          break;
+        case 'year':
+          if (!year) {
+            throw new BadRequestException('Año es requerido para el filtro anual');
+          }
+          timeCondition = "date_part('year', created_at) = $1";
+          params.push(year);
+          break;
+        default:
+          timeCondition = "date_trunc('week', created_at) = date_trunc('week', CURRENT_DATE)";
+      }
+
+      const query = `
+        SELECT * FROM registered_supports
+        WHERE ${timeCondition}
+        ORDER BY created_at DESC
+      `;
+
+      const supports = await this.dataSource.query(query, params);
+
+      if (supports.length === 0) {
+        let periodDescription = timeFilter === 'week' ? 'la semana actual' :
+                                timeFilter === 'month' ? `el mes ${month}/${year}` :
+                                `el año ${year}`;
+        throw new NotFoundException(`No se encontraron soportes registrados para ${periodDescription}`);
+      }
+
+      return supports;
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(`Error al buscar soportes registrados`, error.stack);
+      throw new CustomDatabaseException('Error al buscar soportes registrados. Por favor, inténtelo de nuevo más tarde.');
+    }
   }
 
   async getSupportsByStatusCount(){

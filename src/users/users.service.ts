@@ -111,7 +111,38 @@ export class UsersService {
     await this.userRepository.update(id, { isActive : false });
   }
 
-  
+  async getUsersByRole(role: 'TECNICO' | 'ADMINISTRADOR' | 'CLIENTE') {
+    const query = `
+      SELECT 
+        u.id,
+        CONCAT(u.name, ' ', u.lastname) AS full_name,
+        u.phone,
+        u.email
+      FROM users u
+      INNER JOIN user_has_roles uhr ON u.id = uhr.id_user
+      INNER JOIN roles r ON uhr.id_rol = r.id
+      WHERE r.name = $1
+      AND u."isActive" = true
+      ORDER BY u.id DESC
+    `;
+    
+    try {
+      const users = await this.userRepository.query(query, [role]);
+      
+      if (users.length === 0) {
+        throw new NotFoundException(`No se encontraron usuarios con el rol ${role}`);
+      }
+
+      return users;
+    } catch (error) {
+      this.logger.error(`Error al obtener usuarios ${role}: ${error.message}`);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error al obtener los usuarios ${role}`);
+    }
+  }
+
   
 
   private handleDBExceptions( error: any ){    

@@ -18,13 +18,13 @@ export class Support{
   serial: string;
 
   @Column({ default: 'Ninguno' })
-  componentA: string;
+  component_a: string;
 
   @Column({ default: 'Ninguno' })
-  componentB: string;
+  component_b: string;
 
   @Column({ default: 'Ninguno' })
-  componentC: string;
+  component_c: string;
 
   @Column({ default: 'Ninguno' })
   accessories: string;
@@ -45,7 +45,7 @@ export class Support{
   image3: string;
 
   @Column({ default: '-' })
-  descriptionFail: string;
+  description_fail: string;
 
   @Column({ default: '-' })
   solution: string;
@@ -58,16 +58,16 @@ export class Support{
 
   //--
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
-  estimatedPrice: number;
+  estimated_price: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
-  finalPrice: number;
+  final_price: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
-  depositAmount: number;
+  deposit_amount: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
-  remainingBalance: number;
+  remaining_balance: number;
   //--
 
   @Column({  //fecha de creacion
@@ -81,7 +81,7 @@ export class Support{
     default:() =>'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP'
   })
-  updateStatus_at: Date;
+  update_status_at: Date;
 
   @Column({ //fecha de entrega al cliente
     type:'timestamp', 
@@ -115,16 +115,16 @@ export class Support{
     this.device = this.device || 'Ninguno';
     this.brand = this.brand || 'Ninguno';
     this.serial = this.serial || 'Ninguno';
-    this.componentA = this.componentA || 'Ninguno';
-    this.componentB = this.componentB || 'Ninguno';
-    this.componentC = this.componentC || 'Ninguno';
+    this.component_a = this.component_a || 'Ninguno';
+    this.component_b = this.component_b || 'Ninguno';
+    this.component_c = this.component_c || 'Ninguno';
     this.accessories = this.accessories || 'Ninguno';
-    this.descriptionFail = this.descriptionFail || '-';
+    this.description_fail = this.description_fail || '-';
     this.solution = this.solution || '-';
     this.technical = this.technical || '-';
-    this.image1 = this.image1 || 'https://res.cloudinary.com/doglf2gsy/image/upload/v1722206801/lunzignh36hftfuv6b6z.png';
-    this.image2 = this.image2 || 'https://res.cloudinary.com/doglf2gsy/image/upload/v1722206801/lunzignh36hftfuv6b6z.png';
-    this.image3 = this.image3 || 'https://res.cloudinary.com/doglf2gsy/image/upload/v1722206801/lunzignh36hftfuv6b6z.png';
+    this.image1 = this.image1 || '-';
+    this.image2 = this.image2 || '-';
+    this.image3 = this.image3 || '-';
     this.price = this.price || 0.00;
     this.status_id = this.status_id || 1;
   }
@@ -132,10 +132,10 @@ export class Support{
   @BeforeInsert()
   @BeforeUpdate()
   calculatePrices() {
-    this.estimatedPrice = this.estimatedPrice || 0.00;
-    this.finalPrice = this.finalPrice || this.estimatedPrice;
-    this.depositAmount = this.depositAmount || 0.00;
-    this.remainingBalance = Math.max(0, this.finalPrice - this.depositAmount);
+    this.estimated_price = this.estimated_price || 0.00;
+    this.final_price = this.final_price || this.estimated_price;
+    this.deposit_amount = this.deposit_amount || 0.00;
+    this.remaining_balance = Math.max(0, this.final_price - this.deposit_amount);
   }
 
   // @BeforeUpdate()

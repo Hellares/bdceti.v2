@@ -23,6 +23,20 @@ export class UsersController {
     return this.usersService.findAll(paginatioDto);
   }
 
+  @Get('tech')
+  getTechnicalSupport() {
+    return this.usersService.getUsersByRole('TECNICO');
+  }
+  @Get('admin')
+  getAdministrators() {
+    return this.usersService.getUsersByRole('ADMINISTRADOR');
+  }
+
+  @Get('client')
+  getClients() {
+    return this.usersService.getUsersByRole('CLIENTE');
+  }
+
   @HasRoles(JwtRole.ADMIN)
   @UseGuards(JwtAuthGuard, JwtRolesGuard)
   @Get(':identifier')
@@ -83,4 +97,7 @@ export class UsersController {
   async softDelete(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.usersService.softDelete(id);
   }
+
+
+  
 }

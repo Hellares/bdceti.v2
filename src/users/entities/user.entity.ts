@@ -22,7 +22,6 @@ export class User {
   lastname: string;
 
   @Column({
-    unique: true,
     nullable: true,
   })
   email: string;

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { CacheModule } from '@nestjs/cache-manager';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { FilesModule } from './files/files.module';
@@ -28,6 +29,10 @@ import { BrandModule } from './brand/brand.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ cache: true }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 300, // 300 segundos = 5 minutos
+    }),
 
     TypeOrmModule.forRoot({
       type: 'postgres',

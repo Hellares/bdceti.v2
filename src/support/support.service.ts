@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import * as moment from 'moment-timezone';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Support } from './entities/support.entity';
@@ -12,6 +12,8 @@ import { User } from 'src/users/entities/user.entity';
 import { clear } from 'console';
 import { use } from 'passport';
 import { CustomDatabaseException } from 'src/utils/custom_database_exception';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 
 interface SupportStats {
@@ -34,6 +36,7 @@ export class SupportService {
     private dataSource: DataSource,
     // @InjectRepository(Status) private statusRepository: Repository<Status>,
     private readonly filesService: FilesService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ){}
 
   
@@ -79,6 +82,8 @@ export class SupportService {
       throw new InternalServerErrorException('Error retrieving saved support with user details');
     }
 
+    // Invalidar el caché después de crear el soporte
+    await this.invalidateSupportCache(savedSupport.status_id);
     return savedSupport;
   }
 
@@ -188,6 +193,7 @@ export class SupportService {
     if (!support) {
       throw new NotFoundException(`Support with ID ${update.id} not found`);
     }
+    const oldStatusId = support.status_id;
     const newStatusId = Number(update.status_id);
     support.status_id = newStatusId;
     
@@ -198,74 +204,288 @@ export class SupportService {
     }
 
     const updatedSupport  = await this.supportRepository.save(support);
+
+    // Invalidar el caché para ambos estados (antiguo y nuevo)
+    await this.invalidateSupportCache(oldStatusId);
+    if (oldStatusId !== newStatusId) {
+      await this.invalidateSupportCache(newStatusId);
+    }
     return updatedSupport;
   }
 
-  async findAllRegistered(): Promise<any[]> { //! buscar todos los soportes registrados o pendientes de la vista
-    try {
-      const query = `SELECT * FROM registered_supports`;
-      const supports = await this.dataSource.query(query);
-      if (supports.length === 0) {
-        throw new NotFoundException('No se encontraron soportes registrados');
-      }
-      return supports;
-    } catch (error) {
-      this.logger.error('Error al buscar soportes registrados', error.stack);
-      throw new CustomDatabaseException('Error al buscar soportes registrados. Por favor, inténtelo de nuevo más tarde.');
+  
+  // async findAllRegisteredTime(
+  //   timeFilter: 'week' | 'month' | 'year',
+  //   statusId: number,
+  //   page: number = 1,
+  //   pageSize: number = 20,
+  //   month?: number,
+  //   year?: number
+  // ): Promise<{ 
+  //   data: any[], 
+  //   total: number, 
+  //   page: number, 
+  //   pageSize: number, 
+  //   totalPages: number, 
+  //   hasNextPage: boolean 
+  // }> {
+  //   const cacheKey = `supports_${timeFilter}_${statusId}_${page}_${pageSize}_${month}_${year}`;
+    
+  //   // Intenta obtener los resultados del caché
+  //   const cachedResult = await this.cacheManager.get(cacheKey);
+  //   if (cachedResult) {
+  //     this.logger.log(`Returning cached result for ${cacheKey}`);
+  //     return cachedResult as { 
+  //       data: any[], 
+  //       total: number, 
+  //       page: number, 
+  //       pageSize: number, 
+  //       totalPages: number, 
+  //       hasNextPage: boolean 
+  //     };
+  //   }
+  
+  //   try {
+  //     const offset = (page - 1) * pageSize;
+  //     let startDate: string;
+  //     let endDate: string;
+  
+  //     const currentDate = moment().tz('America/Lima');
+  
+  //     switch (timeFilter) {
+  //       case 'week':
+  //         startDate = currentDate.clone().startOf('week').format('YYYY-MM-DD');
+  //         endDate = currentDate.clone().endOf('week').format('YYYY-MM-DD');
+  //         break;
+  //       case 'month':
+  //         if (!month || !year) {
+  //           throw new Error('Mes y año son requeridos para el filtro mensual');
+  //         }
+  //         startDate = moment(`${year}-${month}`, 'YYYY-M').startOf('month').format('YYYY-MM-DD');
+  //         endDate = moment(`${year}-${month}`, 'YYYY-M').endOf('month').format('YYYY-MM-DD');
+  //         break;
+  //       case 'year':
+  //         if (!year) {
+  //           throw new Error('Año es requerido para el filtro anual');
+  //         }
+  //         startDate = `${year}-01-01`;
+  //         endDate = `${year}-12-31`;
+  //         break;
+  //       default:
+  //         throw new Error(`Filtro de tiempo inválido: ${timeFilter}`);
+  //     }
+  
+  //     const query = `
+  //       WITH filtered_supports AS (
+  //         SELECT 
+  //           id, created_at, user_id, status_id,
+  //           device, brand, serial, component_a, component_b, component_c,
+  //           accessories, image1, image2, image3, description_fail,
+  //           solution, technical, price, estimated_price, final_price,
+  //           deposit_amount, remaining_balance, update_status_at, delivered_at
+  //         FROM supports
+  //         WHERE status_id = $1
+  //           AND created_at >= $4::timestamp 
+  //           AND created_at < $5::timestamp
+  //       ),
+  //       counted_supports AS (
+  //         SELECT COUNT(*) AS full_count FROM filtered_supports
+  //       )
+  //       SELECT 
+  //         fs.*,
+  //         u.name AS user_name, 
+  //         u.lastname AS user_lastname, 
+  //         u.dni AS user_dni, 
+  //         u.phone AS user_phone, 
+  //         st.name AS status_name,
+  //         cs.full_count
+  //       FROM filtered_supports fs
+  //       JOIN users u ON fs.user_id = u.id
+  //       JOIN status st ON fs.status_id = st.id
+  //       CROSS JOIN counted_supports cs
+  //       ORDER BY fs.created_at DESC
+  //       LIMIT $2 OFFSET $3
+  //     `;
+  
+  //     const params = [statusId, pageSize, offset, startDate, endDate];
+  
+  //     this.logger.debug('SQL Query:', query);
+  //     this.logger.debug('Query Parameters:', params);
+  
+  //     const supports = await this.dataSource.query(query, params);
+  //     const total = supports.length > 0 ? parseInt(supports[0].full_count) : 0;
+  
+  //     const totalPages = Math.ceil(total / pageSize);
+  //     const hasNextPage = page < totalPages;
+  
+  //     const result = {
+  //       data: supports.map(support => {
+  //         const { full_count, ...supportData } = support;
+  //         return supportData;
+  //       }),
+  //       total,
+  //       page,
+  //       pageSize,
+  //       totalPages,
+  //       hasNextPage
+  //     };
+  
+  //     // Guarda el resultado en caché
+  //     await this.cacheManager.set(cacheKey, result, 300000); // 300000 ms = 5 minutos
+  
+  //     return result;
+  //   } catch (error) {
+  //     this.logger.error(`Error al buscar soportes: ${error.message}`, error.stack);
+  //     throw error;
+  //   }
+  // }
+  async findAllRegisteredTime(
+    timeFilter: 'month' | 'year' | 'custom' = 'month',
+    statusId: number,
+    page: number = 1,
+    pageSize: number = 20,
+    month?: number,
+    year?: number,
+    startDate?: string,
+    endDate?: string
+  ): Promise<{ 
+    data: any[], 
+    total: number, 
+    page: number, 
+    pageSize: number, 
+    totalPages: number, 
+    hasNextPage: boolean 
+  }> {
+    const cacheKey = `supports_${timeFilter}_${statusId}_${page}_${pageSize}_${month}_${year}_${startDate}_${endDate}`;
+    
+    // Intenta obtener los resultados del caché
+    const cachedResult = await this.cacheManager.get(cacheKey);
+    if (cachedResult) {
+      // this.logger.log(`Returning cached result for ${cacheKey}`);
+      return cachedResult as { 
+        data: any[], 
+        total: number, 
+        page: number, 
+        pageSize: number, 
+        totalPages: number, 
+        hasNextPage: boolean 
+      };
     }
-  }
-
-  async findAllRegisteredTime(timeFilter: 'week' | 'month' | 'year' = 'week', month?: number, year?: number): Promise<any[]> {
+  
     try {
-      let timeCondition: string;
-      let params: any[] = [];
-
+      const offset = (page - 1) * pageSize;
+      let queryStartDate: string;
+      let queryEndDate: string;
+  
+      const currentDate = moment().tz('America/Lima');
+  
       switch (timeFilter) {
-        case 'week':
-          timeCondition = "date_trunc('week', created_at) = date_trunc('week', CURRENT_DATE)";
-          break;
         case 'month':
-          if (!month || !year) {
-            throw new BadRequestException('Mes y año son requeridos para el filtro mensual');
+          if (month && year) {
+            queryStartDate = moment(`${year}-${month}-01`, 'YYYY-MM-DD').startOf('month').format('YYYY-MM-DD');
+            queryEndDate = moment(`${year}-${month}-01`, 'YYYY-MM-DD').endOf('month').format('YYYY-MM-DD');
+          } else {
+            queryStartDate = currentDate.clone().startOf('month').format('YYYY-MM-DD');
+            queryEndDate = currentDate.clone().endOf('month').format('YYYY-MM-DD');
           }
-          timeCondition = "date_trunc('month', created_at) = date_trunc('month', $1::date)";
-          params.push(`${year}-${month.toString().padStart(2, '0')}-01`);
           break;
         case 'year':
-          if (!year) {
-            throw new BadRequestException('Año es requerido para el filtro anual');
+          if (year) {
+            queryStartDate = moment(`${year}-01-01`, 'YYYY-MM-DD').startOf('year').format('YYYY-MM-DD');
+            queryEndDate = moment(`${year}-12-31`, 'YYYY-MM-DD').endOf('year').format('YYYY-MM-DD');
+          } else {
+            queryStartDate = currentDate.clone().startOf('year').format('YYYY-MM-DD');
+            queryEndDate = currentDate.clone().endOf('year').format('YYYY-MM-DD');
           }
-          timeCondition = "date_part('year', created_at) = $1";
-          params.push(year);
+          break;
+        case 'custom':
+          if (!startDate || !endDate) {
+            throw new Error('Fecha de inicio y fin son requeridas para el filtro personalizado');
+          }
+          // Validar y formatear las fechas de inicio y fin
+          const parsedStartDate = moment(startDate, 'YYYY-MM-DD', true);
+          const parsedEndDate = moment(endDate, 'YYYY-MM-DD', true);
+          
+          if (!parsedStartDate.isValid() || !parsedEndDate.isValid()) {
+            throw new Error('El formato de fecha debe ser YYYY-MM-DD');
+          }
+          
+          if (parsedEndDate.isBefore(parsedStartDate)) {
+            throw new Error('La fecha de fin no puede ser anterior a la fecha de inicio');
+          }
+          
+          queryStartDate = parsedStartDate.format('YYYY-MM-DD');
+          queryEndDate = parsedEndDate.format('YYYY-MM-DD');
           break;
         default:
-          timeCondition = "date_trunc('week', created_at) = date_trunc('week', CURRENT_DATE)";
+          throw new Error(`Filtro de tiempo inválido: ${timeFilter}`);
       }
-
+  
       const query = `
-        SELECT * FROM registered_supports
-        WHERE ${timeCondition}
-        ORDER BY created_at DESC
+        WITH filtered_supports AS (
+          SELECT 
+            id, created_at, user_id, status_id,
+            device, brand, serial, component_a, component_b, component_c,
+            accessories, image1, image2, image3, description_fail,
+            solution, technical, price, estimated_price, final_price,
+            deposit_amount, remaining_balance, update_status_at, delivered_at
+          FROM supports
+          WHERE status_id = $1
+            AND created_at >= $4::date 
+            AND created_at < ($5::date + interval '1 day')
+        ),
+        counted_supports AS (
+          SELECT COUNT(*) AS full_count FROM filtered_supports
+        )
+        SELECT 
+          fs.*,
+          u.name AS user_name, 
+          u.lastname AS user_lastname, 
+          u.dni AS user_dni, 
+          u.phone AS user_phone, 
+          st.name AS status_name,
+          cs.full_count
+        FROM filtered_supports fs
+        JOIN users u ON fs.user_id = u.id
+        JOIN status st ON fs.status_id = st.id
+        CROSS JOIN counted_supports cs
+        ORDER BY fs.created_at DESC
+        LIMIT $2 OFFSET $3
       `;
-
+  
+      const params = [statusId, pageSize, offset, queryStartDate, queryEndDate];
+  
+      // this.logger.debug('SQL Query:', query);
+      // this.logger.debug('Query Parameters:', params);
+  
       const supports = await this.dataSource.query(query, params);
-
-      if (supports.length === 0) {
-        let periodDescription = timeFilter === 'week' ? 'la semana actual' :
-                                timeFilter === 'month' ? `el mes ${month}/${year}` :
-                                `el año ${year}`;
-        throw new NotFoundException(`No se encontraron soportes registrados para ${periodDescription}`);
-      }
-
-      return supports;
+      const total = supports.length > 0 ? parseInt(supports[0].full_count) : 0;
+  
+      const totalPages = Math.ceil(total / pageSize);
+      const hasNextPage = page < totalPages;
+  
+      const result = {
+        data: supports.map(support => {
+          const { full_count, ...supportData } = support;
+          return supportData;
+        }),
+        total,
+        page,
+        pageSize,
+        totalPages,
+        hasNextPage
+      };
+  
+      // Guarda el resultado en caché
+      await this.cacheManager.set(cacheKey, result, 300000); // 300000 ms = 5 minutos
+  
+      return result;
     } catch (error) {
-      if (error instanceof BadRequestException || error instanceof NotFoundException) {
-        throw error;
-      }
-      this.logger.error(`Error al buscar soportes registrados`, error.stack);
-      throw new CustomDatabaseException('Error al buscar soportes registrados. Por favor, inténtelo de nuevo más tarde.');
+      this.logger.error(`Error al buscar soportes: ${error.message}`, error.stack);
+      throw error;
     }
   }
+
 
   async getSupportsByStatusCount(){
     try {
@@ -292,7 +512,18 @@ export class SupportService {
 
 
 
-
+  private async invalidateSupportCache(statusId: number): Promise<void> {  //! Invalida el caché para el estado especificado
+    const cacheKeys = await this.cacheManager.store.keys() as string[];
+    const keysToDelete = cacheKeys.filter(key => 
+      key.startsWith('supports_') && key.includes(`_${statusId}_`)
+    );
+    
+    for (const key of keysToDelete) {
+      await this.cacheManager.del(key);
+    }
+    
+    this.logger.log(`Invalidated cache for status ID: ${statusId}`);
+  }
 
 
 

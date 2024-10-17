@@ -1,6 +1,24 @@
 import { Transform } from "class-transformer";
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
+const transformToNumber = ({ value }) => {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    // Eliminar todos los separadores de miles (comas)
+    const sanitizedValue = value.replace(/,/g, '');
+    // Convertir a número
+    const number = Number(sanitizedValue);
+    // Verificar si es un número válido
+    return isNaN(number) ? null : number;
+  }
+  return null; // Para cualquier otro tipo, devolver null
+};
+
 export class CreateSupportDto{  
 
   @IsString()
@@ -47,21 +65,25 @@ export class CreateSupportDto{
   @IsOptional()
   price?: number;
 
-  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
-  estimated_price?: number; //precio estimado
+  @Transform(transformToNumber)
+  @IsNumber()
+  estimated_price?: number;
+  
+  @IsOptional()
+  @Transform(transformToNumber)
+  @IsNumber()
+  final_price?: number;
 
-  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
-  final_price?: number;  // precio final
+  @Transform(transformToNumber)
+  @IsNumber()
+  deposit_amount?: number;
 
-  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
   @IsOptional()
-  deposit_amount?: number; // monto depositado a cuenta
-
-  @Transform(({ value }) => value ? parseFloat(value.replace(/,/g, '')) : value)
-  @IsOptional()
-  remaining_balance?: number; // saldo pendiente
+  @Transform(transformToNumber)
+  @IsNumber()
+  remaining_balance?: number;
 
   @IsNotEmpty()
   user_id: number;

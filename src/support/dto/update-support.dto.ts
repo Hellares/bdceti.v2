@@ -1,69 +1,57 @@
-import { isNotEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+
+import { Transform } from "class-transformer";
+import { isNotEmpty, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+
+const transformToNumber = ({ value }) => {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    // Eliminar todos los separadores de miles (comas)
+    const sanitizedValue = value.replace(/,/g, '');
+    // Convertir a número
+    const number = Number(sanitizedValue);
+    // Verificar si es un número válido
+    return isNaN(number) ? null : number;
+  }
+  return null; // Para cualquier otro tipo, devolver null
+};
 
 export class UpdateSupportDto{
 
 
   @IsNotEmpty()
   id?: number;
-  
-  @IsString()
-  @IsOptional()
-  device?: string;
-
-  @IsString()
-  @IsOptional()
-  brand?: string;
-
-  @IsString()
-  @IsOptional()
-  serial?: string;
-
-  @IsString()
-  @IsOptional()
-  componentA?: string;
-
-  @IsString()
-  @IsOptional()
-  componentB?: string;
-
-  @IsString()
-  @IsOptional()
-  componentC?: string;
-
-  @IsString()
-  @IsOptional()
-  accessories?: string;
-
-  @IsString()
-  @IsOptional()
-  image1?: string;
-
-  @IsString()
-  @IsOptional()
-  image2?: string;
-
-  @IsString()
-  @IsOptional()
-  image3?: string;
-
-  @IsString()
-  @IsOptional()
-  descriptionFail?: string;
-
-  @IsString()
-  @IsOptional()
-  solution?: string;
-
 
   @IsOptional()
   status_id?: number;
-
 
   @IsString()
   @IsOptional()
   technical?: string;
 
-  @IsNumber()
   @IsOptional()
-  price?: number;
+  @Transform(transformToNumber)
+  @IsNumber()
+  estimated_price?: number;
+
+  @IsOptional()
+  @Transform(transformToNumber)
+  @IsNumber()
+  final_price?: number;
+
+  @IsOptional()
+  @Transform(transformToNumber)
+  @IsNumber()
+  deposit_amount?: number;
+
+  @IsOptional()
+  @IsString()
+  description_output?: string;
+
+
+  
 }

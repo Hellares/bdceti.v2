@@ -1,5 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import * as moment from 'moment-timezone';
+import { plainToInstance } from 'class-transformer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Support } from './entities/support.entity';
 import { Repository, DataSource } from 'typeorm';
@@ -39,34 +40,35 @@ export class SupportService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ){}
 
-  
-  async createSupport(files: Express.Multer.File[] | undefined, support: CreateSupportDto) {
-    const newSupport = this.supportRepository.create(support);
-    let savedSupport = await this.supportRepository.save(newSupport);
-  
-    const imageFields = ['image1', 'image2', 'image3'];
-    
-    if (files && files.length > 0) {
-      const uploadPromises = files.slice(0, 3).map(async (file, index) => {
-        try {
-          const { secure_url } = await this.filesService.uploadImage(file);
-          if (secure_url) {
-            savedSupport[imageFields[index]] = secure_url;
-          }
-        } catch (error) {
-          console.error(`Error uploading image ${index + 1}:`, error);
-          // Optionally, you can choose to throw an error here or just continue
-        }
-      });
-    
-      await Promise.all(uploadPromises);
-      
-      savedSupport = await this.supportRepository.save(savedSupport);
-    }
-  
-    try {
-      savedSupport = await this.supportRepository.findOne({
-        where: { id: savedSupport.id },
+  private transformNumericFields(support: Partial<Support>): Partial<Support> {
+    const numericFields = ['estimated_price', 'final_price', 'deposit_amount', 'remaining_balance'];
+    numericFields.forEach(field => {
+      if (support[field] !== undefined && support[field] !== null) {
+        support[field] = parseFloat(support[field].toString());
+      }
+    });
+    return support;
+  }
+
+  private async saveSupportAndInvalidateCache(support: Support): Promise<Support> {
+    const savedSupport = await this.supportRepository.save(support);
+    await this.invalidateSupportCache(savedSupport.status_id);
+    return this.formatSupportResponse(savedSupport);
+  }
+
+  private async formatSupportResponse(support: Support): Promise<Support> {
+    const formattedData = { ...support };
+    const numericFields = ['estimated_price', 'final_price', 'deposit_amount', 'remaining_balance'];
+    numericFields.forEach(field => {
+      if (formattedData[field] !== null && formattedData[field] !== undefined) {
+        formattedData[field] = parseFloat(formattedData[field].toString()).toFixed(2);
+      }
+    });
+
+    // Fetch user details if not already included
+    if (!formattedData.user) {
+      const supportWithUser = await this.supportRepository.findOne({
+        where: { id: support.id },
         relations: ['user'],
         select: {
           user: {
@@ -74,17 +76,45 @@ export class SupportService {
             name: true,
             lastname: true,
             phone: true,
-            // Add here other user fields you want to include
           }
         },
       });
-    } catch (error) {
-      throw new InternalServerErrorException('Error retrieving saved support with user details');
+      if (supportWithUser) {
+        formattedData.user = supportWithUser.user;
+      }
     }
+    const formattedSupport = plainToInstance(Support, formattedData);
 
-    // Invalidar el caché después de crear el soporte
-    await this.invalidateSupportCache(savedSupport.status_id);
-    return savedSupport;
+    return formattedSupport;
+  }
+  
+  
+  async createSupport(files: Express.Multer.File[] | undefined, supportDto: CreateSupportDto): Promise<Support> {
+    try {
+      let newSupport = this.supportRepository.create(this.transformNumericFields(supportDto));
+      newSupport = await this.supportRepository.save(newSupport);
+
+      if (files && files.length > 0) {
+        const imageFields = ['image1', 'image2', 'image3'];
+        const uploadPromises = files.slice(0, 3).map(async (file, index) => {
+          try {
+            const { secure_url } = await this.filesService.uploadImage(file);
+            if (secure_url) {
+              newSupport[imageFields[index]] = secure_url;
+            }
+          } catch (error) {
+            this.logger.error(`Error uploading image ${index + 1}:`, error);
+          }
+        });
+        await Promise.all(uploadPromises);
+        newSupport = await this.supportRepository.save(newSupport);
+      }
+
+      return this.saveSupportAndInvalidateCache(newSupport);
+    } catch (error) {
+      this.logger.error('Error in createSupport:', error);
+      throw new InternalServerErrorException('Error creating support');
+    }
   }
 
 
@@ -214,131 +244,7 @@ export class SupportService {
   }
 
   
-  // async findAllRegisteredTime(
-  //   timeFilter: 'week' | 'month' | 'year',
-  //   statusId: number,
-  //   page: number = 1,
-  //   pageSize: number = 20,
-  //   month?: number,
-  //   year?: number
-  // ): Promise<{ 
-  //   data: any[], 
-  //   total: number, 
-  //   page: number, 
-  //   pageSize: number, 
-  //   totalPages: number, 
-  //   hasNextPage: boolean 
-  // }> {
-  //   const cacheKey = `supports_${timeFilter}_${statusId}_${page}_${pageSize}_${month}_${year}`;
-    
-  //   // Intenta obtener los resultados del caché
-  //   const cachedResult = await this.cacheManager.get(cacheKey);
-  //   if (cachedResult) {
-  //     this.logger.log(`Returning cached result for ${cacheKey}`);
-  //     return cachedResult as { 
-  //       data: any[], 
-  //       total: number, 
-  //       page: number, 
-  //       pageSize: number, 
-  //       totalPages: number, 
-  //       hasNextPage: boolean 
-  //     };
-  //   }
   
-  //   try {
-  //     const offset = (page - 1) * pageSize;
-  //     let startDate: string;
-  //     let endDate: string;
-  
-  //     const currentDate = moment().tz('America/Lima');
-  
-  //     switch (timeFilter) {
-  //       case 'week':
-  //         startDate = currentDate.clone().startOf('week').format('YYYY-MM-DD');
-  //         endDate = currentDate.clone().endOf('week').format('YYYY-MM-DD');
-  //         break;
-  //       case 'month':
-  //         if (!month || !year) {
-  //           throw new Error('Mes y año son requeridos para el filtro mensual');
-  //         }
-  //         startDate = moment(`${year}-${month}`, 'YYYY-M').startOf('month').format('YYYY-MM-DD');
-  //         endDate = moment(`${year}-${month}`, 'YYYY-M').endOf('month').format('YYYY-MM-DD');
-  //         break;
-  //       case 'year':
-  //         if (!year) {
-  //           throw new Error('Año es requerido para el filtro anual');
-  //         }
-  //         startDate = `${year}-01-01`;
-  //         endDate = `${year}-12-31`;
-  //         break;
-  //       default:
-  //         throw new Error(`Filtro de tiempo inválido: ${timeFilter}`);
-  //     }
-  
-  //     const query = `
-  //       WITH filtered_supports AS (
-  //         SELECT 
-  //           id, created_at, user_id, status_id,
-  //           device, brand, serial, component_a, component_b, component_c,
-  //           accessories, image1, image2, image3, description_fail,
-  //           solution, technical, price, estimated_price, final_price,
-  //           deposit_amount, remaining_balance, update_status_at, delivered_at
-  //         FROM supports
-  //         WHERE status_id = $1
-  //           AND created_at >= $4::timestamp 
-  //           AND created_at < $5::timestamp
-  //       ),
-  //       counted_supports AS (
-  //         SELECT COUNT(*) AS full_count FROM filtered_supports
-  //       )
-  //       SELECT 
-  //         fs.*,
-  //         u.name AS user_name, 
-  //         u.lastname AS user_lastname, 
-  //         u.dni AS user_dni, 
-  //         u.phone AS user_phone, 
-  //         st.name AS status_name,
-  //         cs.full_count
-  //       FROM filtered_supports fs
-  //       JOIN users u ON fs.user_id = u.id
-  //       JOIN status st ON fs.status_id = st.id
-  //       CROSS JOIN counted_supports cs
-  //       ORDER BY fs.created_at DESC
-  //       LIMIT $2 OFFSET $3
-  //     `;
-  
-  //     const params = [statusId, pageSize, offset, startDate, endDate];
-  
-  //     this.logger.debug('SQL Query:', query);
-  //     this.logger.debug('Query Parameters:', params);
-  
-  //     const supports = await this.dataSource.query(query, params);
-  //     const total = supports.length > 0 ? parseInt(supports[0].full_count) : 0;
-  
-  //     const totalPages = Math.ceil(total / pageSize);
-  //     const hasNextPage = page < totalPages;
-  
-  //     const result = {
-  //       data: supports.map(support => {
-  //         const { full_count, ...supportData } = support;
-  //         return supportData;
-  //       }),
-  //       total,
-  //       page,
-  //       pageSize,
-  //       totalPages,
-  //       hasNextPage
-  //     };
-  
-  //     // Guarda el resultado en caché
-  //     await this.cacheManager.set(cacheKey, result, 300000); // 300000 ms = 5 minutos
-  
-  //     return result;
-  //   } catch (error) {
-  //     this.logger.error(`Error al buscar soportes: ${error.message}`, error.stack);
-  //     throw error;
-  //   }
-  // }
   async findAllRegisteredTime(
     timeFilter: 'month' | 'year' | 'custom' = 'month',
     statusId: number,
@@ -485,6 +391,29 @@ export class SupportService {
       throw error;
     }
   }
+
+  
+
+  async updateSupportFields(id: number, updateSupportDto: UpdateSupportDto): Promise<Support> {
+    try {
+      let support = await this.supportRepository.findOne({ where: { id } });
+      if (!support) {
+        throw new NotFoundException(`Support with ID ${id} not found`);
+      }
+
+      const updatedFields = this.transformNumericFields(updateSupportDto);
+      Object.assign(support, updatedFields);
+
+      return this.saveSupportAndInvalidateCache(support);
+    } catch (error) {
+      this.logger.error('Error in updateSupportFields:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error updating support');
+    }
+  }
+
 
 
   async getSupportsByStatusCount(){

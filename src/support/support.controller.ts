@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, DefaultValuePipe, FileTypeValidator, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, DefaultValuePipe, FileTypeValidator, Get, HttpException, HttpStatus, InternalServerErrorException, Logger, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Put, Query, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { SupportService } from './support.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateSupportDto } from './dto/create-support.dto';
@@ -348,6 +348,13 @@ private getPeriodDescription(
   }
 }
 
+  @Patch(':id/fields')
+  async updatePrices(
+    @Param('id') id: number,
+    @Body() updateSupportDto: UpdateSupportDto
+  ) {
+    return this.supportService.updateSupportFields(id, updateSupportDto);
+  }
 
 
 

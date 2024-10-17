@@ -56,6 +56,9 @@ export class Support{
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
   price: number;
 
+  @Column({default: '-'})
+  description_output: string;
+
   //--
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
   estimated_price: number;
@@ -126,6 +129,7 @@ export class Support{
     this.image2 = this.image2 || '-';
     this.image3 = this.image3 || '-';
     this.price = this.price || 0.00;
+    this.description_output = this.description_output || '-';
     this.status_id = this.status_id || 1;
   }
 

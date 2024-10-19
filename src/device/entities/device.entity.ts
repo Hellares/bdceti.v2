@@ -1,5 +1,5 @@
 import { Component } from "src/component/entities/component.entity";
-import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'devices'})
 export class Device {
@@ -15,4 +15,11 @@ export class Device {
 
   @OneToMany(() => Component, (component) => component.device)
   components: Component[];
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  setDefaultValues() {
+    this.image = this.image || '-';
+
+  }
 }

@@ -15,16 +15,22 @@ export class DeviceService {
     @InjectRepository(Component) private readonly componentRepository: Repository<Component>,
     private readonly filesService: FilesService
   ) {}
-  async createDevice(file: Express.Multer.File, createteDeviceDto: CreateDeviceDto) {
-    if(!file){
-      throw new BadRequestException('Seleccione una imagen');
-    }
 
+  async createDevice(file: Express.Multer.File | undefined, createDeviceDto: CreateDeviceDto) {
     try {
-      const {secure_url} = await this.filesService.uploadImage(file);
-      createteDeviceDto.image = secure_url;
-
-      let newDevice = this.deviceRepository.create(createteDeviceDto);
+      let secure_url: string | undefined;
+  
+      if (file) {
+        const uploadResult = await this.filesService.uploadImage(file);
+        secure_url = uploadResult.secure_url;
+      }
+  
+      // Si hay una imagen, la añadimos al DTO. Si no, la propiedad image quedará undefined.
+      if (secure_url) {
+        createDeviceDto.image = secure_url;
+      }
+  
+      let newDevice = this.deviceRepository.create(createDeviceDto);
       await this.deviceRepository.save(newDevice);
       return newDevice;
     } catch (error) {

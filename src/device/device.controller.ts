@@ -14,21 +14,40 @@ export class DeviceController {
 
   //@HasRoles(JwtRole.ADMIN)
   //@UseGuards(JwtAuthGuard, JwtRolesGuard)
+  // @Post()
+  // @UseInterceptors(FileInterceptor('image'))
+  // createDeviceWithImage(
+  //   @UploadedFile(
+  //     new ParseFilePipe({
+  //       validators: [
+  //         new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }),
+  //         new FileTypeValidator({ fileType: 'png|jpg|jpeg' }),
+  //       ],
+  //     })
+  //   )image: Express.Multer.File,
+  //   @Body() createteDeviceDto: CreateDeviceDto
+  // ) {
+  //   return this.deviceService.createDevice(image, createteDeviceDto);    
+  // }
+
   @Post()
   @UseInterceptors(FileInterceptor('image'))
-  createDeviceWithImage(
+  createDevice(
+    @Body() createDeviceDto: CreateDeviceDto,
     @UploadedFile(
       new ParseFilePipe({
+        fileIsRequired: false,
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }),
           new FileTypeValidator({ fileType: 'png|jpg|jpeg' }),
         ],
       })
-    )image: Express.Multer.File,
-    @Body() createteDeviceDto: CreateDeviceDto
+    ) image?: Express.Multer.File
   ) {
-    return this.deviceService.createDevice(image, createteDeviceDto);    
-  }
+    return this.deviceService.createDevice(image, createDeviceDto);
+  }                     
+
+
 
   @Post(':id/components')
   async assignComponentes(

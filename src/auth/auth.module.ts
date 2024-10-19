@@ -15,7 +15,7 @@ import { Rol } from 'src/roles/entities/rol.entity';
     TypeOrmModule.forFeature([User, Rol]),
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: '90d' },
     }),
   ],
   providers: [AuthService, RolesService, JwtStrategy],
